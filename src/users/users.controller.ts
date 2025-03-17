@@ -3,7 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -20,8 +22,16 @@ export class UsersController {
   }
 
   @Get(':id')
-  getUserById(@Param('id') userId: string) {
-    return `This action returns user ${userId}`;
+  getUserById(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
+      }),
+    )
+    userId: string,
+  ) {
+    return `This action returns user ${typeof userId}`;
   }
 
   @Post()
