@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-users.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Controller('users')
 export class UsersController {
@@ -36,7 +37,12 @@ export class UsersController {
 
   @Post()
   createUser(@Body() createUserDto: CreateUserDto) {
-    this.usersService.createUser(createUserDto);
+    const newDate = new Date();
+    createUserDto.id = uuidv4();
+    createUserDto.createdAt = newDate;
+    createUserDto.updatedAt = newDate;
+    // Chuyển đổi từ plain object sang class instance
+    this.usersService.createUser(CreateUserDto.plainToClass(createUserDto));
     return 'User created successfully';
   }
 
