@@ -4,22 +4,23 @@ import {
   Delete,
   Get,
   HttpStatus,
+  Inject,
   Param,
   ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-users.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(@Inject('USER_SERVICE') private userService: UsersService) {}
 
   @Get()
   getAllUsers() {
-    return this.usersService.getAllUsers();
+    return this.userService.getAllUsers();
   }
 
   @Get(':id')
@@ -42,7 +43,7 @@ export class UsersController {
     createUserDto.createdAt = newDate;
     createUserDto.updatedAt = newDate;
     // Chuyển đổi từ plain object sang class instance
-    this.usersService.createUser(CreateUserDto.plainToClass(createUserDto));
+    this.userService.createUser(CreateUserDto.plainToClass(createUserDto));
     return 'User created successfully';
   }
 
