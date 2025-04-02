@@ -1,59 +1,76 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
-  HttpStatus,
+  HttpException,
   Inject,
   Param,
-  ParseIntPipe,
+  Patch,
   Post,
-  Put,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-users.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from './users.service';
+import mongoose from 'mongoose';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(@Inject('USER_SERVICE') private userService: UsersService) {}
 
   @Get()
-  getAllUsers() {
+  async getAllUsers() {
     return this.userService.getAllUsers();
   }
 
   @Get(':id')
-  getUserById(
-    @Param(
-      'id',
-      new ParseIntPipe({
-        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
-      }),
-    )
+  async getUserById(
+    @Param('id')
     userId: string,
   ) {
-    return `This action returns user ${typeof userId}`;
+    const isValidId = mongoose.isValidObjectId(userId);
+    if (!isValidId) {
+      throw new BadRequestException('Invalid user ID format');
+    }
+    const findUser = await this.userService.getUserById(userId);
+    return findUser;
   }
 
   @Post()
-  createUser(@Body() createUserDto: CreateUserDto) {
-    const newDate = new Date();
-    createUserDto.id = uuidv4();
-    createUserDto.createdAt = newDate;
-    createUserDto.updatedAt = newDate;
+  async createUser(@Body() createUserDto: CreateUserDto) {
     // Chuyển đổi từ plain object sang class instance
-    this.userService.createUser(CreateUserDto.plainToClass(createUserDto));
-    return 'User created successfully';
+    return this.userService.createUser(
+      CreateUserDto.plainToClass(createUserDto),
+    );
   }
 
-  @Put(':id')
-  updateUser(@Param('id') userId: string) {
-    return `This action updates user ${userId}`;
+  @Patch(':id')
+  async updateUser(
+    @Param('id')
+    userId: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const isValidId = mongoose.isValidObjectId(userId);
+    if (!isValidId) {
+      throw new BadRequestException('Invalid user ID format');
+    }
+    const formatData = UpdateUserDto.plainToClass(updateUserDto);
+    console.log('data: ', formatData);
+    const findUser = await this.userService.updateUser(userId, formatData);
+    return findUser;
   }
 
   @Delete(':id')
-  removeUser(@Param('id') userId: string) {
-    return `This action removes user ${userId}`;
+  async removeUser(@Param('id') userId: string) {
+    const isValidId = mongoose.isValidObjectId(userId);
+    if (!isValidId) {
+      throw new BadRequestException('Invalid user ID format');
+    }
+    const deleteUserRes = await this.userService.deleteUser(userId);
+    if (!deleteUserRes) {
+      throw new HttpException('User not found', 404);
+    }
+    return `Delete user ${userId} successfully`;
   }
 }

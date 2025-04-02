@@ -3,9 +3,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-  imports: [UsersModule],
+  imports: [
+    UsersModule,
+    MongooseModule.forRoot('mongodb://localhost:27017/Nestjs_learning'),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
