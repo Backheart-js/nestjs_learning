@@ -40,9 +40,7 @@ export class UsersController {
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
     // Chuyển đổi từ plain object sang class instance
-    return this.userService.createUser(
-      CreateUserDto.plainToClass(createUserDto),
-    );
+    return this.userService.createUser(createUserDto);
   }
 
   @Patch(':id')

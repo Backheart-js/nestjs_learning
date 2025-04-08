@@ -4,6 +4,7 @@ import { UsersController } from './users.controller';
 import { MockUsersService } from './mock-users.service';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UserConfig, UserConfigSchema } from 'src/schemas/user-config.schema';
 
 const googleConfig = {
   clientId: process.env.GOOGLE_CLIENT_ID,
@@ -12,7 +13,13 @@ const googleConfig = {
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      {
+        name: UserConfig.name,
+        schema: UserConfigSchema,
+      },
+    ]),
   ],
   controllers: [UsersController],
   providers: [
