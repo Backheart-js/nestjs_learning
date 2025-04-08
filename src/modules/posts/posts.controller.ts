@@ -12,9 +12,7 @@ import mongoose from 'mongoose';
 
 @Controller('posts')
 export class PostsController {
-  constructor(
-    private readonly postService: PostsService, // Replace 'any' with the actual type of your service
-  ) {}
+  constructor(private readonly postService: PostsService) {}
 
   @Get()
   async getAllPosts() {
